@@ -2,46 +2,36 @@
 
 Dieses Dokument beschreibt die für den Prototypen der smarten Tischlampe ausgewählte Hardware und deren Verschaltung. Das Design ist auf hohe Energieeffizienz und Modularität ausgelegt.
 
-## Blockdiagramm der Schaltung
+## Schaltungsübersicht
 
-Ein visueller Überblick über die Verbindungen der Hauptkomponenten.
+Die folgende Darstellung ist ein funktionales Blockdiagramm, das die logischen Verbindungen zwischen den Hauptkomponenten zeigt. Es dient dem schnellen Verständnis des Systems. Eine detaillierte, technische Schaltung wird nach Abschluss des PCB-Designs in KiCad als Bild exportiert und hier verlinkt.
 
 ```mermaid
 graph TD
-    subgraph Ladestation
-        Pogo_Pins[Pogo-Pins (5V)]
+    subgraph "Stromversorgung & Ladung"
+        direction LR
+        A1(Ladestation 5V) -- "Pogo-Pins" --> B1(TP4056 Modul);
+        B1 -- "Laden" --> C1(LiPo Akku 3.7V);
+        B1 -- "5V Versorgung" --> D1(ESP32 VIN);
+        C1 -- "Akku-Spannung" --> E1(Spannungsteiler);
     end
 
-    subgraph Lampe
-        subgraph Ladeelektronik
-            TP4056[TP4056 Modul]
-            LiPo[LiPo Akku (3.7V)]
-        end
-
-        subgraph Controller & Sensoren
-            ESP32[ESP32 Dev-Kit]
-            RTC[DS3231 RTC]
-            Lichtsensor[BH1750 Lichtsensor]
-            Spannungsteiler[Spannungsteiler]
-        end
-
-        subgraph Beleuchtung
-            LEDs[WS2812B LEDs]
-        end
+    subgraph "Controller & Logik"
+        direction TB
+        F1(ESP32 Dev-Kit)
+        E1 -- "V_mess (ADC)" --> F1;
+        G1(DS3231 RTC) -- "I2C" --> F1;
+        H1(BH1750 Lichtsensor) -- "I2C" --> F1;
+        G1 -- "Wake-Up Signal" --> F1;
     end
 
-    Pogo_Pins --&gt; |IN+ / IN-| TP4056
-    TP4056 --&gt; |B+ / B-| LiPo
-    TP4056 --&gt; |OUT+ / OUT-| ESP32_VIN{5V (VIN)}
-    LiPo --&gt; |Akku+| Spannungsteiler --&gt; |ADC| ESP32
-    
-    ESP32 --&gt; |I2C (SDA/SCL)| RTC
-    ESP32 --&gt; |I2C (SDA/SCL)| Lichtsensor
-    ESP32 --&gt; |GPIO| LEDs
-    RTC --&gt; |Interrupt| ESP32
+    subgraph "Beleuchtung"
+        direction TB
+        F1 -- "Daten" --> I1(WS2812B LEDs);
+    end
 
-    style Pogo_Pins fill:#f9f,stroke:#333,stroke-width:2px
-    style LiPo fill:#f9f,stroke:#333,stroke-width:2px
+    style A1 fill:#f9f,stroke:#333,stroke-width:2px
+    style C1 fill:#f9f,stroke:#333,stroke-width:2px
 ```
 
 ## Komponenten im Detail
