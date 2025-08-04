@@ -1,9 +1,3 @@
 theme: jekyll-theme-minimal
 title: Tischlampe Gastro
 description: Dokumentation für das smarte Tischlampen-Projekt für die Gastronomie.
-
-plugins:
-  - jekyll-mermaid
-
-mermaid:
-  version: "9.1.3" # Use a specific version for stability
