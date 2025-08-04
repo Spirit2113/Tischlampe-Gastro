@@ -28,6 +28,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1' # Or a version compatible with your gems
+          bundler-cache: true # Caches gems for faster builds
+          working-directory: './docs'
       - name: Build with Jekyll
         # This action builds the Jekyll site from the './docs' directory
         uses: actions/jekyll-build-pages@v1
